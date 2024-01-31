@@ -13,81 +13,80 @@
 使用场景： 1、如果一个系统需要在构件的抽象化角色和具体化角色之间增加更多的灵活性，避免在两个层次之间建立静态的继承联系，通过桥接模式可以使它们在抽象层建立一个关联关系。 2、对于那些不希望使用继承或因为多层次继承导致系统类的个数急剧增加的系统，桥接模式尤为适用。 3、一个类存在两个独立变化的维度，且这两个维度都需要进行扩展。
 注意事项：对于两个独立变化的维度，使用桥接模式再适合不过了。
      */
-namespace 桥接模式
+namespace 桥接模式;
+
+internal class Program
 {
-    internal class Program
+    private static void Main(string[] args)
     {
-        private static void Main(string[] args)
+        Shape redCircle = new Circle(100, 100, 10, new RedCircle());
+        Shape greenCircle = new Circle(100, 100, 10, new GreenCircle());
+
+        redCircle.Draw();
+        greenCircle.Draw();
+
+        Console.ReadKey();
+    }
+
+    /// <summary>
+    /// 步骤 1 创建桥接实现接口。
+    /// </summary>
+    public interface DrawAPI
+    {
+        void DrawCircle(int radius, int x, int y);
+    }
+
+    /// <summary>
+    /// 步骤 2  创建实现了 DrawAPI 接口的实体桥接实现类。
+    /// </summary>
+    public class RedCircle : DrawAPI
+    {
+        public void DrawCircle(int radius, int x, int y)
         {
-            Shape redCircle = new Circle(100, 100, 10, new RedCircle());
-            Shape greenCircle = new Circle(100, 100, 10, new GreenCircle());
+            Console.WriteLine("Drawing Circle[ color: red, radius: " + radius + ", x: " + x + ", " + y + "]");
+        }
+    }
 
-            redCircle.Draw();
-            greenCircle.Draw();
+    public class GreenCircle : DrawAPI
+    {
+        public void DrawCircle(int radius, int x, int y)
+        {
+            Console.WriteLine("Drawing Circle[ color: green, radius: " + radius + ", x: " + x + ", " + y + "]");
+        }
+    }
 
-            Console.ReadKey();
+    /// <summary>
+    /// 步骤 3 使用 DrawAPI 接口创建抽象类 Shape。
+    /// </summary>
+    public abstract class Shape
+    {
+        protected DrawAPI drawAPI;
+
+        public Shape(DrawAPI drawAPI)
+        {
+            this.drawAPI = drawAPI;
         }
 
-        /// <summary>
-        /// 步骤 1 创建桥接实现接口。
-        /// </summary>
-        public interface DrawAPI
+        public abstract void Draw();
+    }
+
+    /// <summary>
+    /// 步骤 4 创建实现了 Shape 接口的实体类。
+    /// </summary>
+    public class Circle : Shape
+    {
+        private int x, y, radius;
+
+        public Circle(int x, int y, int radius, DrawAPI drawAPI) : base(drawAPI)
         {
-            void DrawCircle(int radius, int x, int y);
+            this.x = x;
+            this.y = y;
+            this.radius = radius;
         }
 
-        /// <summary>
-        /// 步骤 2  创建实现了 DrawAPI 接口的实体桥接实现类。
-        /// </summary>
-        public class RedCircle : DrawAPI
+        public override void Draw()
         {
-            public void DrawCircle(int radius, int x, int y)
-            {
-                Console.WriteLine("Drawing Circle[ color: red, radius: " + radius + ", x: " + x + ", " + y + "]");
-            }
-        }
-
-        public class GreenCircle : DrawAPI
-        {
-            public void DrawCircle(int radius, int x, int y)
-            {
-                Console.WriteLine("Drawing Circle[ color: green, radius: " + radius + ", x: " + x + ", " + y + "]");
-            }
-        }
-
-        /// <summary>
-        /// 步骤 3 使用 DrawAPI 接口创建抽象类 Shape。
-        /// </summary>
-        public abstract class Shape
-        {
-            protected DrawAPI drawAPI;
-
-            public Shape(DrawAPI drawAPI)
-            {
-                this.drawAPI = drawAPI;
-            }
-
-            public abstract void Draw();
-        }
-
-        /// <summary>
-        /// 步骤 4 创建实现了 Shape 接口的实体类。
-        /// </summary>
-        public class Circle : Shape
-        {
-            private int x, y, radius;
-
-            public Circle(int x, int y, int radius, DrawAPI drawAPI) : base(drawAPI)
-            {
-                this.x = x;
-                this.y = y;
-                this.radius = radius;
-            }
-
-            public override void Draw()
-            {
-                drawAPI.DrawCircle(radius, x, y);
-            }
+            drawAPI.DrawCircle(radius, x, y);
         }
     }
 }
